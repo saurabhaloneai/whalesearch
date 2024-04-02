@@ -1,2 +1,1 @@
-# search-engine
-semantic search engine
+# WhaleSearch 🐳  - semantic search engine 
