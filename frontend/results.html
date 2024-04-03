@@ -1,31 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Results</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
+{% extends "base.html" %}
+{% block heading %} Search Results - {{ query }} {% endblock %}
+
+{% block content %}
 <body>
-    <header>
-        <nav>
-            <!-- Navigation links can go here -->
-        </nav>
-    </header>
-    <main>
-        <h2>Search Results for "{{ query }}"</h2>
-        <div id="results">
-            {% for result in results %}
-            <div>
-                <h3>{{ result.title }}</h3>
-                <p>{{ result.snippet }}</p>
-                <a href="{{ result.url }}" target="_blank">{{ result.url }}</a>
-            </div>
-            {% endfor %}
-        </div>
-    </main>
-    <footer>
-        <!-- Footer content can go here -->
-    </footer>
+    <ul>
+        {% for url, score in results.items() %}
+            <li><a href="{{ url }}">{{ url }}</a> - Score: {{ score }}</li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
+{% endblock %}
