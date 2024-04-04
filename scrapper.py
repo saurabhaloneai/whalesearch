@@ -1,38 +1,43 @@
 import argparse
-import aiohttp
 import asyncio
 import feedparser
 import pandas as pd
 from bs4 import BeautifulSoup
 import logging
+import aiohttp
+from concurrent.futures import ThreadPoolExecutor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def parse_feed(feed_url):
+async def parse_feed_async(feed_url):
     try:
-        feed = feedparser.parse(feed_url)
+        feed = await asyncio.to_thread(feedparser.parse, feed_url)
         return [entry.link for entry in feed.entries]
     except Exception as e:
-        print(f"Error parsing feed {feed_url}: {e}")
+        logger.error(f"Error parsing feed {feed_url}: {e}")
         return []
 
 
-async def fetch_content(session, url):
-    async with session.get(url) as response:
-        return await response.text()
-
-
-async def process_feed(feed_url, session, loop):
+async def fetch_content_async(session, url):
     try:
-        post_urls = await loop.run_in_executor(None, parse_feed, feed_url)
-        tasks = [fetch_content(session, post_url) for post_url in post_urls]
+        async with session.get(url) as response:
+            return await response.text()
+    except Exception as e:
+        logger.error(f"Error fetching content from {url}: {e}")
+        return None
+
+
+async def process_feed_async(feed_url, session, executor):
+    try:
+        post_urls = await parse_feed_async(feed_url)
+        tasks = [fetch_content_async(session, post_url) for post_url in post_urls]
         post_contents = await asyncio.gather(*tasks)
-        cleaned_contents = [clean_content(content) for content in post_contents]
+        cleaned_contents = await asyncio.gather(*[loop.run_in_executor(executor, clean_content, content) for content in post_contents if content])
         return list(zip(post_urls, cleaned_contents))
     except Exception as e:
-        print(f"Error processing feed {feed_url}: {e}")
+        logger.error(f"Error processing feed {feed_url}: {e}")
         return []
 
 
@@ -53,14 +58,14 @@ def parse_args():
     return parser.parse_args()
 
 
-async def main(feed_file):
+async def main_async(feed_file):
     async with aiohttp.ClientSession() as session:
-        loop = asyncio.get_event_loop()
         with open(feed_file, "r") as file:
             feed_urls = [line.strip() for line in file]
 
-        tasks = [process_feed(feed_url, session, loop) for feed_url in feed_urls]
-        results = await asyncio.gather(*tasks)
+        with ThreadPoolExecutor() as executor:
+            tasks = [process_feed_async(feed_url, session, executor) for feed_url in feed_urls]
+            results = await asyncio.gather(*tasks)
 
     flattened_results = [item for sublist in results for item in sublist]
     df = pd.DataFrame(flattened_results, columns=["URL", "content"])
@@ -69,4 +74,4 @@ async def main(feed_file):
 
 if __name__ == "__main__":
     args = parse_args()
-    asyncio.run(main(args.feed_path))
+    asyncio.run(main_async(args.feed_path))
