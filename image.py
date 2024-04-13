@@ -24,3 +24,19 @@ model, _, _ = open_clip.create_model_and_transforms(
 )
 model.to(device)
 tokenizer = open_clip.get_tokenizer("ViT-B-32")
+
+# 3. Load the index
+index = faiss.read_index("index.bin")
+paths = torch.load("paths.bin")
+
+
+# 4. Define the search function
+def search_images(query):
+    with torch.inference_mode():
+        text = tokenizer([query])
+        text_embedding = model.encode_text(text.to(device)).cpu().numpy()
+        faiss.normalize_L2(text_embedding)
+
+    _, indexes = index.search(x=text_embedding, k=12)
+
+    return [os.path.join(RAW_DATA_DIR, paths[idx]) for idx in indexes[0]]
