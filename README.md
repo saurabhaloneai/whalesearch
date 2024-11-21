@@ -4,4 +4,4 @@
 > ... WhaleSearch is my attempt project to understand how search engine works.
 
 WhaleSearch is an search engine built using LLMs to 
-provide detailed and contextually relevant answers to your queries. By leveraging 
+provide detailed and contextually relevant answers to your queries.
