@@ -21,7 +21,6 @@ class SearchEngine:
         self.embeddings = self._init_embeddings()
         
     def _init_llm(self):
-        """Initialize the LLM model"""
         return LlamaCpp(
             model_path="Phi-3-mini-4k-instruct-fp16.gguf",
             n_gpu_layers=-1,
@@ -32,13 +31,11 @@ class SearchEngine:
         )
     
     def _init_embeddings(self):
-        """Initialize the embedding model"""
         return HuggingFaceEmbeddings(
             model_name='thenlper/gte-small'
         )
     
     def get_serp_results(self, query: str, num_results: int = 5) -> List[Document]:
-        """Get search results from SerpAPI"""
         params = {
             "engine": "google",
             "q": query,
@@ -79,7 +76,6 @@ class SearchEngine:
         )
     
     def setup_rag(self, db: Chroma) -> RetrievalQA:
-        """Setup the RAG pipeline"""
         template = """<|user|>
         Relevant information:
         {context}
@@ -104,19 +100,19 @@ class SearchEngine:
         )
     
     def search_and_answer(self, query: str) -> Dict:
-        # Get search results
+        # search results
         search_results = self.get_serp_results(query)
         
-        # Create vector DB
+        # vector DB
         db = self.create_vector_db(search_results)
         
-        # Setup RAG
+        # RAG
         rag_chain = self.setup_rag(db)
         
-        # Get response
+        # response
         response = rag_chain.invoke(query)
         
-        # Format sources
+        # sources
         sources = [{
             "title": doc.metadata.get("title", ""),
             "url": doc.metadata.get("source", ""),
@@ -134,21 +130,21 @@ class SearchEngineUI:
         self.search_engine = SearchEngine()
     
     def process_query(self, query: str, api_key: str) -> Tuple[str, str]:
-        # Set API key
+        
         os.environ["SERPAPI_API_KEY"] = api_key
         
-        # Show processing message
+        # processing message
         yield "Processing your query...", ""
         
-        # Get results
+        
         results = self.search_engine.search_and_answer(query)
         
-        # Format sources
+        
         sources_text = "\n\nSources:\n"
         for idx, source in enumerate(results["sources"], 1):
             sources_text += f"{idx}. [{source['title']}]({source['url']})\n"
         
-        # Return answer and sources
+        # answer and sources
         yield results["answer"], sources_text
 
     def create_interface(self):
@@ -158,7 +154,7 @@ class SearchEngineUI:
 
             with gr.Row():
                 with gr.Column():
-                    # Input components
+                    # inpts components
                     query_input = gr.Textbox(
                         label="explore ",
                         placeholder="enter your search query here...",
@@ -173,11 +169,11 @@ class SearchEngineUI:
                 
             with gr.Row():
                 with gr.Column():
-                    # Output components
+                    # out 
                     answer_output = gr.Markdown(label="Answer")
                     sources_output = gr.Markdown(label="Sources")
             
-            # Handle search button click
+            # button 
             search_button.click(
                 fn=self.process_query,
                 inputs=[query_input, api_key],
@@ -185,12 +181,12 @@ class SearchEngineUI:
                 show_progress=True
             )
             
-            # Example queries
+            #
             gr.Examples(
                 examples=[
-                    ["What are the latest developments in quantum computing?"],
-                    ["Explain the basics of machine learning"],
-                    ["What is the current state of renewable energy?"]
+                    ["what are the latest developments in octopus recepie ?"],
+                    ["explain the basics of machine learning like jake paul's opponent i mean 58 year old"],
+                    ["what is the current state of doge coin?"]
                 ],
                 inputs=query_input
             )
@@ -206,18 +202,12 @@ class SearchEngineUI:
         return interface
 
 
-def main():
-    # Create UI instance
-    ui = SearchEngineUI()
+ui = SearchEngineUI()
     
-    # Launch the interface
-    ui.create_interface().launch(
-        share=True,
-        server_name="0.0.0.0",
-        server_port=7860,
-        show_error=True,
-    )
-
-
-if __name__ == "__main__":
-    main()
+ 
+ui.create_interface().launch(
+    share=True,
+    server_name="0.0.0.0",
+    server_port=7860,
+    show_error=True,
+)
