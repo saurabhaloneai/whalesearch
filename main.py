@@ -186,7 +186,7 @@ class SearchEngineUI:
                 examples=[
                     ["what are the latest developments in octopus recepie ?"],
                     ["explain the basics of machine learning like jake paul's opponent i mean 58 year old"],
-                    ["what is the current state of doge coin?"]
+                    ["what is the current state of internally achieved agi?"]
                 ],
                 inputs=query_input
             )
