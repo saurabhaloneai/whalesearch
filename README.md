@@ -28,8 +28,13 @@ and ChromaDB for efficient information retrieval.
 > [!IMPORTANT]
 >
 > ... gpu poor ? 
->
-> ... you can run here : <a target="_blank" href="https://lightning.ai/saurabhaloney85/studios/whalesearch-semantic-search-engine-sse">
+<p>You can run it here:</p>
+<a target="_blank" href="https://lightning.ai/saurabhaloney85/studios/whalesearch-semantic-search-engine-sse">
+  <img src="https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/app-2/studio-badge.svg" alt="Open In Studio" />
+</a>
+
+
+<a target="_blank" href="https://lightning.ai/saurabhaloney85/studios/whalesearch-semantic-search-engine-sse">
   <img src="https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/app-2/studio-badge.svg" alt="Open In Studio"/>
 </a>
    ```bash
