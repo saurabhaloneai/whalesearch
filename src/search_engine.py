@@ -1,6 +1,5 @@
-# search_engine.py
 import os
-from typing import List, Dict
+from typing import List, Dict, Optional
 from langchain_community.llms import LlamaCpp
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
@@ -30,33 +29,74 @@ class SearchEngine:
             model_name='thenlper/gte-small'
         )
     
-    def get_serp_results(self, query: str, num_results: int = 5) -> List[Document]:
-        params = {
-            "engine": "google",
-            "q": query,
-            "api_key": os.getenv("SERPAPI_API_KEY"),
-            "num": num_results
-        }
-        
-        search = GoogleSearch(params)
-        results = search.get_dict()
-        
-        documents = []
-        if "organic_results" in results:
-            for result in results["organic_results"]:
+    def get_serp_results(self, query: str, is_image_search: bool = False, num_results: int = 5) -> List[Document]:
+        try:
+            params = {
+                "engine": "google_images" if is_image_search else "google",
+                "q": query,
+                "api_key": os.getenv("SERPAPI_API_KEY"),
+                "num": num_results
+            }
+            
+            search = GoogleSearch(params)
+            results = search.get_dict()
+            
+            documents = []
+            if is_image_search and "images_results" in results:
+                for result in results["images_results"]:
+                    doc = Document(
+                        page_content=f"Title: {result.get('title', '')}\n\nDescription: {result.get('snippet', '')}\n\nContent: Image URL: {result.get('original', '')}",
+                        metadata={
+                            "source": result.get("source", ""),
+                            "title": result.get("title", ""),
+                            "position": result.get("position", 0),
+                            "image_url": result.get("original", ""),
+                            "thumbnail": result.get("thumbnail", "")
+                        }
+                    )
+                    documents.append(doc)
+            elif not is_image_search and "organic_results" in results:
+                for result in results["organic_results"]:
+                    doc = Document(
+                        page_content=f"Title: {result.get('title', '')}\n\nSnippet: {result.get('snippet', '')}\n\nContent: {result.get('content', '')}",
+                        metadata={
+                            "source": result.get("link", ""),
+                            "title": result.get("title", ""),
+                            "position": result.get("position", 0)
+                        }
+                    )
+                    documents.append(doc)
+                    
+            if not documents:
+                # Add a default document if no results were found
                 doc = Document(
-                    page_content=f"Title: {result.get('title', '')}\n\nSnippet: {result.get('snippet', '')}\n\nContent: {result.get('content', '')}",
+                    page_content=f"No results found for query: {query}",
                     metadata={
-                        "source": result.get("link", ""),
-                        "title": result.get("title", ""),
-                        "position": result.get("position", 0)
+                        "source": "",
+                        "title": "No Results",
+                        "position": 0
                     }
                 )
                 documents.append(doc)
-        
-        return documents
+                
+            return documents
+            
+        except Exception as e:
+            # Add an error document in case of API failures
+            doc = Document(
+                page_content=f"Error occurred while searching: {str(e)}",
+                metadata={
+                    "source": "",
+                    "title": "Error",
+                    "position": 0
+                }
+            )
+            return [doc]
     
-    def create_vector_db(self, documents: List[Document]) -> Chroma:
+    def create_vector_db(self, documents: List[Document]) -> Optional[Chroma]:
+        if not documents:
+            return None
+            
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=500,
             chunk_overlap=50
@@ -64,22 +104,37 @@ class SearchEngine:
         
         splits = text_splitter.split_documents(documents)
         
+        if not splits:
+            return None
+            
         return Chroma.from_documents(
             documents=splits,
             embedding=self.embeddings,
             persist_directory="./chroma_db"
         )
     
-    def setup_rag(self, db: Chroma) -> RetrievalQA:
-        template = """<|user|>
-        Relevant information:
-        {context}
-
-        Question: {question}
-        
-        Please provide a detailed answer using the above information. Include relevant citations.
-        <|end|>
-        <|assistant|>"""
+    def setup_rag(self, db: Optional[Chroma], is_image_search: bool = False) -> Optional[RetrievalQA]:
+        if db is None:
+            return None
+            
+        if is_image_search:
+            template = """<|user|>
+            Relevant information including images:
+            {context}
+            Question: {question}
+            
+            Please provide a detailed answer using the above information. Include relevant citations and image descriptions where available.
+            <|end|>
+            <|assistant|>"""
+        else:
+            template = """<|user|>
+            Relevant information:
+            {context}
+            Question: {question}
+            
+            Please provide a detailed answer using the above information. Include relevant citations.
+            <|end|>
+            <|assistant|>"""
         
         prompt = PromptTemplate(
             template=template,
@@ -94,19 +149,58 @@ class SearchEngine:
             return_source_documents=True
         )
     
-    def search_and_answer(self, query: str) -> Dict:
-        search_results = self.get_serp_results(query)
+    def search_and_answer(self, query: str, is_image_search: bool = False) -> Dict:
+        search_results = self.get_serp_results(query, is_image_search)
+        
+        if not search_results:
+            return {
+                "answer": "No results found for your query.",
+                "sources": [],
+                "is_image_search": is_image_search
+            }
+        
         db = self.create_vector_db(search_results)
-        rag_chain = self.setup_rag(db)
-        response = rag_chain.invoke(query)
-        
-        sources = [{
-            "title": doc.metadata.get("title", ""),
-            "url": doc.metadata.get("source", ""),
-            "position": doc.metadata.get("position", 0)
-        } for doc in response["source_documents"]]
-        
-        return {
-            "answer": response["result"],
-            "sources": sources
-        }
+        if db is None:
+            return {
+                "answer": "Unable to process search results.",
+                "sources": [],
+                "is_image_search": is_image_search
+            }
+            
+        rag_chain = self.setup_rag(db, is_image_search)
+        if rag_chain is None:
+            return {
+                "answer": "Unable to generate response.",
+                "sources": [],
+                "is_image_search": is_image_search
+            }
+            
+        try:
+            response = rag_chain.invoke(query)
+            
+            sources = []
+            for doc in response["source_documents"]:
+                source_info = {
+                    "title": doc.metadata.get("title", ""),
+                    "url": doc.metadata.get("source", ""),
+                    "position": doc.metadata.get("position", 0)
+                }
+                
+                if is_image_search:
+                    source_info["image_url"] = doc.metadata.get("image_url", "")
+                    source_info["thumbnail"] = doc.metadata.get("thumbnail", "")
+                
+                sources.append(source_info)
+            
+            return {
+                "answer": response["result"],
+                "sources": sources,
+                "is_image_search": is_image_search
+            }
+            
+        except Exception as e:
+            return {
+                "answer": f"An error occurred while processing your query: {str(e)}",
+                "sources": [],
+                "is_image_search": is_image_search
+            }
