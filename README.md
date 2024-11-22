@@ -61,8 +61,5 @@ and ChromaDB for efficient information retrieval.
 - implement llamaCPP from scratch to inference phi-3
 
 
-
-
-   
-
+## How i build it ? (so simple lol)
    
