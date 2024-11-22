@@ -77,4 +77,11 @@ https://github.com/user-attachments/assets/2bd00282-dc93-42cb-a0a5-33644eab0274
 ## How i build it ? (so simple lol)
 
 > work in process...
-   
+
+### Resources (must go through stuff)
+
+[1] [What is RAG ?](https://arxiv.org/pdf/2005.11401) 
+[2] [Semantic Search and RAG(9th chapter)](https://learning.oreilly.com/library/view/hands-on-large-language/)
+[3] [What is Vector Database ?](https://www.pinecone.io/learn/vector-database/)
+[4] [Understanding how LLM inference works with llama.cpp](https://www.omrimallis.com/posts/understanding-how-llm-inference-works-with-llama-cpp/)
+
