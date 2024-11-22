@@ -1,0 +1,7 @@
+gradio
+serpapi
+langchain
+langchain_community
+llama-cpp-python
+transformers
+chromadb
