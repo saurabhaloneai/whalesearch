@@ -29,8 +29,9 @@ and ChromaDB for efficient information retrieval.
 >
 > ... gpu poor ? 
 >
-> ... you can run here [Link](https://lightning.ai/saurabhaloney85/studios/whalesearch-semantic-search-engine-sse)
-1. Clone the repository:
+> ... you can run here : <a target="_blank" href="https://lightning.ai/saurabhaloney85/studios/whalesearch-semantic-search-engine-sse">
+  <img src="https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/app-2/studio-badge.svg" alt="Open In Studio"/>
+</a>
    ```bash
    git clone https://github.com/your-repo/whalesearch.git
    cd whalesearch
