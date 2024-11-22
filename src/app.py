@@ -72,28 +72,27 @@ class SearchEngineUI:
             
             gr.Examples(
                 examples=[
-                    ["What are the latest developments in octopus recipes?"],
-                    ["Show me pictures of rare deep sea creatures"],
-                    ["What is the current state of internally achieved AGI?"]
+                    ["what are the latest developments in octopus recipes?"],
+                    ["show me pictures of rare deep sea creatures"],
+                    ["what is the current state of internally achieved AGI?"]
                 ],
                 inputs=query_input
             )
             
             gr.Markdown("""
             ### Notes:
-            - You need a valid SerpAPI key to use this search engine
-            - Results may take a few seconds to generate, completely depends on your hardware
-            - Sources are provided with links to original content
-            - Toggle 'Image Search' to include image results in your search
+            - you need a valid SerpAPI key to use this search engine
+            - results may take a few seconds to generate, completely depends on your hardware
+            - sources are provided with links to original content
+            - toggle 'Image Search' to include image results in your search
             """)
         
         return interface
 
-if __name__ == "__main__":
-    ui = SearchEngineUI()
-    ui.create_interface().launch(
-        share=True,
-        server_name="0.0.0.0",
-        server_port=7860,
-        show_error=True,
-    )
+ui = SearchEngineUI()
+ui.create_interface().launch(
+    share=True,
+    server_name="0.0.0.0",
+    server_port=7860,
+    show_error=True,
+)

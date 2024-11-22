@@ -65,4 +65,6 @@ https://github.com/user-attachments/assets/2bd00282-dc93-42cb-a0a5-33644eab0274
 
 
 ## How i build it ? (so simple lol)
+
+> work in process 
    
