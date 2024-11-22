@@ -44,7 +44,23 @@ and ChromaDB for efficient information retrieval.
    cd src
    python3 app.py 
 
-5. Enter your serapi-key and search 
+5. Enter your serapi-key and explore your curiosity.
+
+
+## How to use 
+
+![vid](images/1732274576503487.MP4)
+
+
+## Future work 
+
+- Add support for more search APIs for broader data coverage.
+- Enable multilingual query handling.
+- Optimize performance for low-resource environments.
+- also make it useful for complet local search
+- implement llamaCPP from scratch to inference phi-3
+
+
 
 
    
