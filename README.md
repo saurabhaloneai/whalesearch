@@ -52,7 +52,7 @@ and ChromaDB for efficient information retrieval.
 
 
 
-![img](https://github.com/user-attachments/assets/2bd00282-dc93-42cb-a0a5-33644eab0274)
+https://github.com/user-attachments/assets/2bd00282-dc93-42cb-a0a5-33644eab0274
 
 
 ## Future work 
