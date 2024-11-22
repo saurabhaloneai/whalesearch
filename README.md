@@ -25,6 +25,12 @@ and ChromaDB for efficient information retrieval.
 
 ### Steps
 
+> [!IMPORTANT]
+>
+> ... gpu poor ? 
+>
+> ... you can run here [Link](https://lightning.ai/saurabhaloney85/studios/whalesearch-semantic-search-engine-sse~01gwa9d2ctpmjdtr88gdnp049s/manage/general?tab=files&layout=column&path=cloudspaces%2F01jd8wxjqgyj12n1958mwy2vmm)
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/your-repo/whalesearch.git
@@ -55,13 +61,15 @@ and ChromaDB for efficient information retrieval.
 https://github.com/user-attachments/assets/2bd00282-dc93-42cb-a0a5-33644eab0274
 
 
-## Future work 
+## Future work (TODO)
 
 - Add support for more search APIs for broader data coverage.
 - Enable multilingual query handling.
 - Optimize performance for low-resource environments.
 - also make it useful for complet local search
 - implement llamaCPP from scratch to inference phi-3
+- should solve math problem
+- keyword search need be added
 
 
 ## How i build it ? (so simple lol)
