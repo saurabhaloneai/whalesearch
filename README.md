@@ -49,7 +49,7 @@ and ChromaDB for efficient information retrieval.
 
 ## How to use 
 
-![vid](images/1732274576503487.MP4)
+![vid](images/1732274576503487.mov)
 
 
 ## Future work 
