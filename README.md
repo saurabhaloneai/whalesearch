@@ -49,7 +49,10 @@ and ChromaDB for efficient information retrieval.
 
 ## How to use 
 
-![vid](https://github.com/saurabhaloneai/whalesearch/blob/main/images/1732274576503487.mov)
+
+
+
+![img](https://github.com/user-attachments/assets/2bd00282-dc93-42cb-a0a5-33644eab0274)
 
 
 ## Future work 
