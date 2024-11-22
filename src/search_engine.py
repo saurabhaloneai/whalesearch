@@ -68,7 +68,7 @@ class SearchEngine:
                     documents.append(doc)
                     
             if not documents:
-                # Add a default document if no results were found
+                # if no results were found hehehe
                 doc = Document(
                     page_content=f"No results found for query: {query}",
                     metadata={
@@ -82,7 +82,7 @@ class SearchEngine:
             return documents
             
         except Exception as e:
-            # Add an error document in case of API failures
+            # in case of API failures :)
             doc = Document(
                 page_content=f"Error occurred while searching: {str(e)}",
                 metadata={
