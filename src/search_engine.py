@@ -20,6 +20,8 @@ class SearchEngine:
             n_gpu_layers=-1,
             max_tokens=500,
             n_ctx=2048,
+            temperature=0.7,
+            top_p=0.95,
             seed=42,
             verbose=False
         )
@@ -35,7 +37,10 @@ class SearchEngine:
                 "engine": "google_images" if is_image_search else "google",
                 "q": query,
                 "api_key": os.getenv("SERPAPI_API_KEY"),
-                "num": num_results
+                "num": num_results,
+                "safe": "active",
+                "hl": "en",
+                **({"tbm": "isch"} if is_image_search else {})
             }
             
             search = GoogleSearch(params)
@@ -98,8 +103,9 @@ class SearchEngine:
             return None
             
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=500,
-            chunk_overlap=50
+            chunk_size=1000,
+            chunk_overlap=100,
+            separators=["\n\n", "\n", ".", "!", "?", ",", " ", ""]
         )
         
         splits = text_splitter.split_documents(documents)
@@ -144,7 +150,13 @@ class SearchEngine:
         return RetrievalQA.from_chain_type(
             llm=self.llm,
             chain_type='stuff',
-            retriever=db.as_retriever(search_kwargs={"k": 3}),
+            retriever=db.as_retriever(
+                search_kwargs={
+                    "k": 5,
+                    "fetch_k": 8,
+                    "score_threshold": 0.5
+                }
+            ),
             chain_type_kwargs={"prompt": prompt},
             return_source_documents=True
         )
